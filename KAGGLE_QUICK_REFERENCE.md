@@ -3,6 +3,7 @@
 ## ⚡ Quick Start (5 Steps)
 
 ### 1️⃣ Commit to GitHub
+
 ```bash
 cd "C:\Users\seinp\Documents\yolo training\ultralytics-main"
 git add .
@@ -11,6 +12,7 @@ git push origin main
 ```
 
 ### 2️⃣ Kaggle Setup
+
 - Create new notebook on Kaggle
 - Enable **GPU** (Settings → Accelerator → GPU T4 x2)
 - Add your tomato dataset as **Input**
@@ -19,20 +21,24 @@ git push origin main
 ### 3️⃣ Update Paths (2 places to change!)
 
 **Cell 2 - Your GitHub URL:**
+
 ```python
 GITHUB_REPO = "https://github.com/YOUR_USERNAME/ultralytics-main.git"
 ```
 
 **Cell 3 - Your Kaggle dataset:**
+
 ```python
-KAGGLE_INPUT = '/kaggle/input/your-dataset-name'  # CHANGE THIS!
+KAGGLE_INPUT = "/kaggle/input/your-dataset-name"  # CHANGE THIS!
 ```
 
 ### 4️⃣ Run All Cells
+
 - Click "Run All" or run cells sequentially
 - Training takes ~2-4 hours for 200 epochs
 
 ### 5️⃣ Download Results
+
 - Go to **Output** tab in Kaggle
 - Download: `tomato_disease_detection/yolov8-cbam/weights/best.pt`
 
@@ -40,32 +46,33 @@ KAGGLE_INPUT = '/kaggle/input/your-dataset-name'  # CHANGE THIS!
 
 ## 📋 Complete Cell-by-Cell Checklist
 
-| Cell | Action | Status |
-|------|--------|--------|
-| 1 | Install dependencies | ⬜ |
-| 2 | Clone your GitHub repo (UPDATE URL!) | ⬜ |
-| 3 | Copy dataset to working dir (UPDATE PATH!) | ⬜ |
-| 4 | Create data.yaml | ⬜ |
-| 5 | Verify enhanced model | ⬜ |
-| 6 | Train model (2-4 hours) | ⬜ |
-| 7 | Evaluate performance | ⬜ |
-| 8 | View training curves | ⬜ |
-| 9 | Test predictions | ⬜ |
-| 10 | Export ONNX/TorchScript | ⬜ |
-| 11 | View summary | ⬜ |
+| Cell | Action                                     | Status |
+| ---- | ------------------------------------------ | ------ |
+| 1    | Install dependencies                       | ⬜     |
+| 2    | Clone your GitHub repo (UPDATE URL!)       | ⬜     |
+| 3    | Copy dataset to working dir (UPDATE PATH!) | ⬜     |
+| 4    | Create data.yaml                           | ⬜     |
+| 5    | Verify enhanced model                      | ⬜     |
+| 6    | Train model (2-4 hours)                    | ⬜     |
+| 7    | Evaluate performance                       | ⬜     |
+| 8    | View training curves                       | ⬜     |
+| 9    | Test predictions                           | ⬜     |
+| 10   | Export ONNX/TorchScript                    | ⬜     |
+| 11   | View summary                               | ⬜     |
 
 ---
 
 ## 🎯 Training Parameters (Adjust in Cell 6)
 
 ```python
-EPOCHS = 200          # Training epochs
-BATCH_SIZE = 16       # GPU memory (reduce if OOM)
-IMAGE_SIZE = 640      # Input image size
-MODEL_SCALE = 's'     # Model variant (n/s/m/l/x)
+EPOCHS = 200  # Training epochs
+BATCH_SIZE = 16  # GPU memory (reduce if OOM)
+IMAGE_SIZE = 640  # Input image size
+MODEL_SCALE = "s"  # Model variant (n/s/m/l/x)
 ```
 
 **Model Scales:**
+
 - `n` - Nano: Fastest, lowest accuracy
 - `s` - Small: **RECOMMENDED** ⭐
 - `m` - Medium: Higher accuracy
@@ -77,34 +84,37 @@ MODEL_SCALE = 's'     # Model variant (n/s/m/l/x)
 ## 📊 Expected Training Time
 
 | Model Scale | Batch Size | Time per Epoch | Total (200 epochs) |
-|-------------|------------|----------------|-------------------|
-| n | 32 | ~30 sec | ~2 hours |
-| s | 16 | ~45 sec | ~3 hours |
-| m | 8 | ~90 sec | ~5 hours |
-| l | 4 | ~2 min | ~7 hours |
+| ----------- | ---------- | -------------- | ------------------ |
+| n           | 32         | ~30 sec        | ~2 hours           |
+| s           | 16         | ~45 sec        | ~3 hours           |
+| m           | 8          | ~90 sec        | ~5 hours           |
+| l           | 4          | ~2 min         | ~7 hours           |
 
-*Times are approximate for Kaggle P100 GPU*
+_Times are approximate for Kaggle P100 GPU_
 
 ---
 
 ## ⚠️ Common Issues & Quick Fixes
 
 ### Issue 1: "Dataset not found"
+
 ```python
 # Check available datasets
-print(os.listdir('/kaggle/input'))
+print(os.listdir("/kaggle/input"))
 
 # Update path in Cell 3
-KAGGLE_INPUT = '/kaggle/input/CORRECT-NAME-HERE'
+KAGGLE_INPUT = "/kaggle/input/CORRECT-NAME-HERE"
 ```
 
 ### Issue 2: "Out of memory"
+
 ```python
 # In Cell 6, reduce batch size
 BATCH_SIZE = 8  # or even 4
 ```
 
 ### Issue 3: "Model config not found"
+
 ```python
 # Make sure you committed the enhanced model files:
 # ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml
@@ -112,6 +122,7 @@ BATCH_SIZE = 8  # or even 4
 ```
 
 ### Issue 4: "Import error"
+
 ```python
 # Re-run Cell 1 to reinstall dependencies
 !pip install --upgrade ultralytics opencv-python-headless
@@ -152,6 +163,7 @@ BATCH_SIZE = 8  # or even 4
 ## 📈 Monitoring Training
 
 ### Real-time Metrics (Console)
+
 - `box_loss` - Bounding box loss (lower is better)
 - `cls_loss` - Classification loss (lower is better)
 - `dfl_loss` - Distribution focal loss (lower is better)
@@ -159,6 +171,7 @@ BATCH_SIZE = 8  # or even 4
 - `mAP50-95` - mAP averaged over IoU 0.5-0.95
 
 ### Target Metrics
+
 - **mAP50-95**: > 0.60 (good), > 0.70 (excellent)
 - **mAP50**: > 0.80 (good), > 0.90 (excellent)
 - **Precision**: > 0.80
@@ -187,17 +200,18 @@ tomato_disease_detection/yolov8-cbam/
 ## 🚀 Using Your Trained Model
 
 ### Inference Code
+
 ```python
 from ultralytics import YOLO
 
 # Load model
-model = YOLO('best.pt')
+model = YOLO("best.pt")
 
 # Single image
-results = model.predict('tomato_leaf.jpg', conf=0.25)
+results = model.predict("tomato_leaf.jpg", conf=0.25)
 
 # Batch prediction
-results = model.predict('images/', save=True)
+results = model.predict("images/", save=True)
 
 # Real-time webcam
 results = model.predict(source=0, stream=True)
@@ -217,18 +231,21 @@ for result in results:
 ## 🎯 Performance Tips
 
 ### For Better Accuracy:
+
 1. Use `scale='m'` or `scale='l'`
 2. Increase `EPOCHS` to 300
 3. Enable stronger augmentation
 4. Ensure balanced dataset
 
 ### For Faster Training:
+
 1. Use `scale='n'` or `scale='s'`
 2. Reduce `IMAGE_SIZE` to 512
 3. Increase `BATCH_SIZE` if GPU allows
 4. Set `cache=True` (uses more RAM)
 
 ### For Better Generalization:
+
 1. Use strong data augmentation
 2. Enable `mosaic=1.0, mixup=0.5`
 3. Increase `patience` to 100
@@ -249,6 +266,7 @@ for result in results:
 ## ✅ Success Checklist
 
 Before starting training:
+
 - [ ] GitHub repo has all enhanced files
 - [ ] Kaggle GPU is enabled
 - [ ] Dataset uploaded to Kaggle
@@ -257,6 +275,7 @@ Before starting training:
 - [ ] Labels are in YOLO format
 
 After training:
+
 - [ ] Training completed without errors
 - [ ] Validation metrics are reasonable
 - [ ] Confusion matrix looks good
@@ -268,6 +287,7 @@ After training:
 ## 🎉 Expected Results
 
 With YOLOv8-CBAM enhancements:
+
 - ✨ **+3-8% mAP** over standard YOLOv8
 - ✨ **Better small lesion detection** (P2 feature)
 - ✨ **Improved complex backgrounds** (CBAM)
@@ -280,7 +300,7 @@ With YOLOv8-CBAM enhancements:
 ---
 
 **Files to reference:**
+
 - `KAGGLE_TRAINING_GUIDE.md` - Complete detailed guide
 - `kaggle_train_cells.py` - All code cells
 - `KAGGLE_QUICK_REFERENCE.md` - This file
-

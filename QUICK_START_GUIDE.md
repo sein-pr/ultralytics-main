@@ -9,6 +9,7 @@ All enhancements have been successfully implemented and are ready to use!
 ## 📦 What's Been Added
 
 ### New Modules:
+
 1. **CBAM** - Convolutional Block Attention Module
    - `ChannelAttention` - Channel-wise attention
    - `SpatialAttention` - Spatial attention
@@ -19,6 +20,7 @@ All enhancements have been successfully implemented and are ready to use!
    - `BiRepGFPN` - Full FPN with P2, P3, P4, P5 support
 
 ### New Configuration:
+
 - `ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml`
 
 ---
@@ -31,10 +33,10 @@ Create a YAML file for your tomato disease dataset (e.g., `tomato.yaml`):
 
 ```yaml
 # Dataset configuration
-path: /path/to/your/dataset  # dataset root dir
-train: images/train          # train images (relative to 'path')
-val: images/val              # val images (relative to 'path')
-test: images/test            # test images (optional)
+path: /path/to/your/dataset # dataset root dir
+train: images/train # train images (relative to 'path')
+val: images/val # val images (relative to 'path')
+test: images/test # test images (optional)
 
 # Classes
 names:
@@ -57,11 +59,11 @@ nc: 9
 ```bash
 # Using CLI
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
-           data=tomato.yaml \
-           epochs=200 \
-           imgsz=640 \
-           batch=16 \
-           device=0
+  data=tomato.yaml \
+  epochs=200 \
+  imgsz=640 \
+  batch=16 \
+  device=0
 
 # Or with Python
 python -c "
@@ -77,14 +79,14 @@ model.train(data='tomato.yaml', epochs=200, imgsz=640, batch=16)
 from ultralytics import YOLO
 
 # Load trained model
-model = YOLO('runs/detect/train/weights/best.pt')
+model = YOLO("runs/detect/train/weights/best.pt")
 
 # Validate
 metrics = model.val()
 print(f"mAP50-95: {metrics.box.map}")
 
 # Predict
-results = model.predict('path/to/test/images', save=True)
+results = model.predict("path/to/test/images", save=True)
 ```
 
 ---
@@ -93,15 +95,16 @@ results = model.predict('path/to/test/images', save=True)
 
 Choose the right variant for your hardware:
 
-| Variant | Speed | Accuracy | Use Case |
-|---------|-------|----------|----------|
-| **n** (nano) | ⚡⚡⚡⚡⚡ | ⭐⭐⭐ | Edge devices, real-time |
-| **s** (small) | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | Balanced (recommended) |
-| **m** (medium) | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | High accuracy needed |
-| **l** (large) | ⚡⚡ | ⭐⭐⭐⭐⭐ | Maximum accuracy |
-| **x** (xlarge) | ⚡ | ⭐⭐⭐⭐⭐ | Research, competitions |
+| Variant        | Speed      | Accuracy   | Use Case                |
+| -------------- | ---------- | ---------- | ----------------------- |
+| **n** (nano)   | ⚡⚡⚡⚡⚡ | ⭐⭐⭐     | Edge devices, real-time |
+| **s** (small)  | ⚡⚡⚡⚡   | ⭐⭐⭐⭐   | Balanced (recommended)  |
+| **m** (medium) | ⚡⚡⚡     | ⭐⭐⭐⭐⭐ | High accuracy needed    |
+| **l** (large)  | ⚡⚡       | ⭐⭐⭐⭐⭐ | Maximum accuracy        |
+| **x** (xlarge) | ⚡         | ⭐⭐⭐⭐⭐ | Research, competitions  |
 
 Specify variant:
+
 ```bash
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml scale=s ...
 ```
@@ -113,26 +116,29 @@ yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml scale=s ..
 ### For Better Results:
 
 1. **Start Small, Scale Up:**
+
    ```bash
    # First try with 's' variant
    yolo train model=... scale=s epochs=100 batch=32
-   
+
    # Then try 'm' if you have GPU memory
    yolo train model=... scale=m epochs=200 batch=16
    ```
 
 2. **Use Data Augmentation:**
+
    ```bash
    yolo train model=... \
-              mosaic=1.0 \
-              mixup=0.5 \
-              degrees=10 \
-              translate=0.1 \
-              scale=0.5 \
-              flipud=0.5
+     mosaic=1.0 \
+     mixup=0.5 \
+     degrees=10 \
+     translate=0.1 \
+     scale=0.5 \
+     flipud=0.5
    ```
 
 3. **Monitor Training:**
+
    ```bash
    # View results in TensorBoard
    tensorboard --logdir runs/detect/train
@@ -160,18 +166,21 @@ Compared to standard YOLOv8:
 ## 🐛 Common Issues & Solutions
 
 ### Issue 1: CUDA Out of Memory
+
 ```bash
 # Solution: Reduce batch size
-yolo train model=... batch=8  # or even batch=4
+yolo train model=... batch=8 # or even batch=4
 ```
 
 ### Issue 2: Model Not Converging
+
 ```bash
 # Solution: Adjust learning rate
 yolo train model=... lr0=0.001 lrf=0.01
 ```
 
 ### Issue 3: Overfitting
+
 ```bash
 # Solution: Use more augmentation and dropout
 yolo train model=... dropout=0.5 mixup=0.5 mosaic=1.0
@@ -184,14 +193,17 @@ yolo train model=... dropout=0.5 mixup=0.5 mosaic=1.0
 All files are ready to use:
 
 ### Core Implementation:
+
 - ✅ `ultralytics/nn/modules/block.py` - CBAM & BiRepGFPN modules
 - ✅ `ultralytics/nn/modules/__init__.py` - Module exports
 - ✅ `ultralytics/nn/tasks.py` - Module registration
 
 ### Configuration:
+
 - ✅ `ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml` - Model config
 
 ### Testing & Documentation:
+
 - ✅ `test_cbam_birepgfpn.py` - Full model test
 - ✅ `test_module_imports.py` - Import validation
 - ✅ `IMPLEMENTATION_SUMMARY.md` - Detailed documentation
@@ -216,7 +228,7 @@ results = model.train(
     imgsz=640,
     batch=16,
     device=0,
-    
+
     # Optimization
     optimizer='AdamW',
     lr0=0.001,
@@ -225,7 +237,7 @@ results = model.train(
     weight_decay=0.0005,
     warmup_epochs=3,
     warmup_momentum=0.8,
-    
+
     # Augmentation
     hsv_h=0.015,
     hsv_s=0.7,
@@ -240,7 +252,7 @@ results = model.train(
     mosaic=1.0,
     mixup=0.5,
     copy_paste=0.0,
-    
+
     # Settings
     patience=50,
     save=True,
@@ -285,16 +297,19 @@ print(f"mAP50: {metrics.box.map50:.3f}")
 ## 🌟 Key Features
 
 ### ✨ CBAM Attention
+
 - **Location:** After backbone C2f layers at P2, P3, P4
 - **Effect:** Focuses on important features, reduces background noise
 - **Benefit:** Better detection of small disease spots
 
 ### ✨ BiRepGFPN with P2
+
 - **Levels:** P2 (stride 4), P3 (stride 8), P4 (stride 16), P5 (stride 32)
 - **Flow:** Bi-directional feature fusion
 - **Benefit:** Enhanced multi-scale detection, especially for small objects
 
 ### ✨ Reparameterizable Blocks
+
 - **Training:** Multiple branches (3×3 + 1×1)
 - **Inference:** Single 3×3 (merged branches)
 - **Benefit:** No computational overhead during deployment
@@ -306,6 +321,7 @@ print(f"mAP50: {metrics.box.map50:.3f}")
 ### Check Training Progress:
 
 1. **TensorBoard:**
+
    ```bash
    tensorboard --logdir runs/detect
    ```
@@ -329,6 +345,7 @@ print(f"mAP50: {metrics.box.map50:.3f}")
 ## ✅ Validation Checklist
 
 Before training, verify:
+
 - [ ] Dataset YAML file is configured correctly
 - [ ] Images are in correct format (JPG/PNG)
 - [ ] Labels are in YOLO format (normalized coordinates)
@@ -363,11 +380,10 @@ Your enhanced YOLOv8 model with CBAM and BiRepGFPN is ready to use!
 ```bash
 # Start training now:
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
-           data=tomato.yaml \
-           epochs=200 \
-           imgsz=640 \
-           batch=16
+  data=tomato.yaml \
+  epochs=200 \
+  imgsz=640 \
+  batch=16
 ```
 
 **Happy Training! 🚀🍅**
-
