@@ -51,9 +51,9 @@ print(f"✓ Current directory: {os.getcwd()}")
 # We need to copy to /kaggle/working for training
 
 # UPDATE THIS with your actual Kaggle dataset name!
-KAGGLE_INPUT = '/kaggle/input/your-dataset-name'
-WORKING_DIR = '/kaggle/working'
-DATASET_DIR = os.path.join(WORKING_DIR, 'dataset')
+KAGGLE_INPUT = "/kaggle/input/your-dataset-name"
+WORKING_DIR = "/kaggle/working"
+DATASET_DIR = os.path.join(WORKING_DIR, "dataset")
 
 print(f"Copying dataset from {KAGGLE_INPUT} to {DATASET_DIR}...")
 
@@ -70,29 +70,27 @@ print("✓ Dataset copied successfully")
 ```python
 # Cell 4: Create data.yaml
 data_yaml = {
-    'path': DATASET_DIR,
-    'train': 'images/train',
-    'val': 'images/valid',
-    'test': 'images/test',
-    
-    'nc': 9,
-    
-    'names': [
-        'Early Blight',
-        'Healthy',
-        'Late Blight',
-        'Leaf Miner',
-        'Leaf Mold',
-        'Mosaic Virus',
-        'Septoria',
-        'Spider Mites',
-        'Yellow Leaf Curl Virus'
-    ]
+    "path": DATASET_DIR,
+    "train": "images/train",
+    "val": "images/valid",
+    "test": "images/test",
+    "nc": 9,
+    "names": [
+        "Early Blight",
+        "Healthy",
+        "Late Blight",
+        "Leaf Miner",
+        "Leaf Mold",
+        "Mosaic Virus",
+        "Septoria",
+        "Spider Mites",
+        "Yellow Leaf Curl Virus",
+    ],
 }
 
 # Save configuration
-data_yaml_path = os.path.join(WORKING_DIR, 'tomato_data.yaml')
-with open(data_yaml_path, 'w') as f:
+data_yaml_path = os.path.join(WORKING_DIR, "tomato_data.yaml")
+with open(data_yaml_path, "w") as f:
     yaml.dump(data_yaml, f, default_flow_style=False, sort_keys=False)
 
 print(f"✓ Data configuration saved: {data_yaml_path}")
@@ -102,22 +100,23 @@ print(f"✓ Data configuration saved: {data_yaml_path}")
 
 ```python
 # Cell 5: Check enhanced model
-model_config = 'ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml'
+model_config = "ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml"
 
 if os.path.exists(model_config):
     print(f"✓ Enhanced model found: {model_config}")
-    
+
     # Test load
     from ultralytics import YOLO
+
     model = YOLO(model_config)
-    
+
     # Check CBAM modules
-    cbam_count = sum(1 for m in model.model.model if 'CBAM' in m.__class__.__name__)
+    cbam_count = sum(1 for m in model.model.model if "CBAM" in m.__class__.__name__)
     print(f"✓ Found {cbam_count} CBAM modules")
-    
+
     # Check detection heads
-    detect = [m for m in model.model.model if 'Detect' in m.__class__.__name__]
-    if detect and hasattr(detect[0], 'stride'):
+    detect = [m for m in model.model.model if "Detect" in m.__class__.__name__]
+    if detect and hasattr(detect[0], "stride"):
         print(f"✓ Detection heads: {len(detect[0].stride)}")
 else:
     print("❌ Model config not found!")
@@ -146,17 +145,17 @@ results = model.train(
     batch=BATCH_SIZE,
     device=0,  # Use GPU
     scale=MODEL_SCALE,
-    
+
     # Project settings
     project='tomato_disease_detection',
     name='yolov8-cbam',
-    
+
     # Optimization
     optimizer='AdamW',
     lr0=0.001,
     lrf=0.01,
     warmup_epochs=3,
-    
+
     # Data augmentation
     hsv_h=0.015,
     hsv_s=0.7,
@@ -168,7 +167,7 @@ results = model.train(
     fliplr=0.5,
     mosaic=1.0,
     mixup=0.5,
-    
+
     # Settings
     patience=50,
     save=True,
@@ -186,22 +185,22 @@ print("✅ Training complete!")
 
 ```python
 # Cell 7: Validation
-best_model_path = 'tomato_disease_detection/yolov8-cbam/weights/best.pt'
+best_model_path = "tomato_disease_detection/yolov8-cbam/weights/best.pt"
 best_model = YOLO(best_model_path)
 
 # Validate
 val_results = best_model.val(data=data_yaml_path)
 
 # Print metrics
-print("="*80)
+print("=" * 80)
 print("📊 Validation Metrics:")
-print("="*80)
+print("=" * 80)
 print(f"mAP50-95: {val_results.box.map:.4f}")
 print(f"mAP50:    {val_results.box.map50:.4f}")
 print(f"mAP75:    {val_results.box.map75:.4f}")
 print(f"Precision: {val_results.box.mp:.4f}")
 print(f"Recall:    {val_results.box.mr:.4f}")
-print("="*80)
+print("=" * 80)
 ```
 
 ### Step 8: Visualize Results
@@ -210,34 +209,30 @@ print("="*80)
 # Cell 8: Display results
 from IPython.display import Image, display
 
-results_dir = 'tomato_disease_detection/yolov8-cbam'
+results_dir = "tomato_disease_detection/yolov8-cbam"
 
 # Training curves
-display(Image(filename=f'{results_dir}/results.png', width=800))
+display(Image(filename=f"{results_dir}/results.png", width=800))
 
 # Confusion matrix
-display(Image(filename=f'{results_dir}/confusion_matrix.png', width=600))
+display(Image(filename=f"{results_dir}/confusion_matrix.png", width=600))
 
 # F1 curve
-display(Image(filename=f'{results_dir}/F1_curve.png', width=600))
+display(Image(filename=f"{results_dir}/F1_curve.png", width=600))
 
 # PR curve
-display(Image(filename=f'{results_dir}/PR_curve.png', width=600))
+display(Image(filename=f"{results_dir}/PR_curve.png", width=600))
 ```
 
 ### Step 9: Test Predictions
 
 ```python
 # Cell 9: Run predictions
-test_dir = os.path.join(DATASET_DIR, 'images', 'test')
+test_dir = os.path.join(DATASET_DIR, "images", "test")
 
 if os.path.exists(test_dir):
     predictions = best_model.predict(
-        source=test_dir,
-        save=True,
-        conf=0.25,
-        project='tomato_disease_detection',
-        name='predictions'
+        source=test_dir, save=True, conf=0.25, project="tomato_disease_detection", name="predictions"
     )
     print("✓ Predictions saved!")
 ```
@@ -247,11 +242,11 @@ if os.path.exists(test_dir):
 ```python
 # Cell 10: Export for deployment
 # ONNX format
-onnx_path = best_model.export(format='onnx', imgsz=640)
+onnx_path = best_model.export(format="onnx", imgsz=640)
 print(f"✓ ONNX exported: {onnx_path}")
 
 # TorchScript format
-ts_path = best_model.export(format='torchscript', imgsz=640)
+ts_path = best_model.export(format="torchscript", imgsz=640)
 print(f"✓ TorchScript exported: {ts_path}")
 ```
 
@@ -284,10 +279,10 @@ Based on CBAM and P2 feature enhancements:
 from ultralytics import YOLO
 
 # Load model
-model = YOLO('best.pt')
+model = YOLO("best.pt")
 
 # Predict on image
-results = model.predict('tomato_leaf.jpg', conf=0.25)
+results = model.predict("tomato_leaf.jpg", conf=0.25)
 
 # Process results
 for result in results:
@@ -303,34 +298,38 @@ for result in results:
 ## 🐛 Troubleshooting
 
 ### Out of Memory Error
+
 ```python
 # Reduce batch size
 BATCH_SIZE = 8  # or even 4
 ```
 
 ### Model Not Found Error
+
 ```python
 # Make sure you committed the enhanced model to your GitHub repo
 # Check: ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml
 ```
 
 ### Dataset Not Found
+
 ```python
 # Verify Kaggle dataset name
 # Check: /kaggle/input/your-dataset-name
-print(os.listdir('/kaggle/input'))
+print(os.listdir("/kaggle/input"))
 ```
 
 ### Slow Training
+
 ```python
 # Enable AMP (Automatic Mixed Precision)
-amp=True
+amp = True
 
 # Reduce image size
-imgsz=512
+imgsz = 512
 
 # Use smaller model
-scale='n'  # nano model
+scale = "n"  # nano model
 ```
 
 ---
@@ -338,10 +337,12 @@ scale='n'  # nano model
 ## 📈 Monitor Training
 
 ### In Notebook:
+
 - Check console output for real-time metrics
 - View plots in output folder after training
 
 ### After Training:
+
 - `results.png` - Training curves
 - `confusion_matrix.png` - Class confusion
 - `F1_curve.png` - F1 score vs confidence
@@ -390,6 +391,7 @@ scale='n'  # nano model
 ## ✅ Final Checklist
 
 Before training:
+
 - [ ] GitHub repo cloned successfully
 - [ ] Dataset copied to working directory
 - [ ] `tomato_data.yaml` created
@@ -398,6 +400,7 @@ Before training:
 - [ ] All paths updated correctly
 
 After training:
+
 - [ ] Training completed without errors
 - [ ] Validation metrics look reasonable
 - [ ] Weights saved successfully
@@ -407,4 +410,3 @@ After training:
 ---
 
 **🍅 Good luck training your enhanced YOLOv8-CBAM model for tomato disease detection! 🚀**
-
