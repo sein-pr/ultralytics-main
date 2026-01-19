@@ -1,3 +1,4 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
 """
 YOLOv8-CBAM Training on Kaggle - Copy each cell to Kaggle notebook
 Complete training pipeline for tomato disease detection
