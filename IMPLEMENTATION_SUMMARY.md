@@ -9,7 +9,7 @@ This document summarizes the successful implementation of CBAM (Convolutional Bl
 ## 📋 What Was Implemented
 
 ### 1. **CBAM Module** (`ultralytics/nn/modules/block.py`)
-   
+
 Three new attention classes were added:
 
 - **`ChannelAttention`**: Implements channel-wise attention using global average pooling and max pooling with a 3-layer MLP (reduction ratio of 16)
@@ -17,6 +17,7 @@ Three new attention classes were added:
 - **`CBAM`**: Combines channel and spatial attention sequentially
 
 **Key Features:**
+
 - Reduction ratio: 16 (configurable)
 - Kernel size: 7×7 for spatial attention (configurable)
 - Full docstrings and type hints
@@ -32,6 +33,7 @@ Two new classes were added:
 - **`BiRepGFPN`**: Full bi-directional feature pyramid network with P2, P3, P4, P5 support
 
 **Key Features:**
+
 - Supports P2 (stride 4) for better small object detection
 - Top-down pathway: P5 → P4 → P3 → P2
 - Bottom-up pathway: P2 → P3 → P4 → P5
@@ -44,6 +46,7 @@ Two new classes were added:
 ### 3. **Module Registration**
 
 All modules were properly registered in:
+
 - ✅ `ultralytics/nn/modules/block.py` - Added to `__all__`
 - ✅ `ultralytics/nn/modules/__init__.py` - Added to imports and `__all__`
 - ✅ `ultralytics/nn/tasks.py` - Added to module imports
@@ -53,29 +56,32 @@ All modules were properly registered in:
 A complete YOLOv8 configuration with CBAM and BiRepGFPN was created:
 
 **Backbone Structure:**
+
 ```yaml
-- Conv [64, 3, 2]      # P1/2
-- Conv [128, 3, 2]     # P2/4 ⭐
+- Conv [64, 3, 2] # P1/2
+- Conv [128, 3, 2] # P2/4 ⭐
 - C2f [128]
-- CBAM [128]           # ⭐ CBAM after C2f
-- Conv [256, 3, 2]     # P3/8
+- CBAM [128] # ⭐ CBAM after C2f
+- Conv [256, 3, 2] # P3/8
 - C2f [256]
-- CBAM [256]           # ⭐ CBAM after C2f
-- Conv [512, 3, 2]     # P4/16
+- CBAM [256] # ⭐ CBAM after C2f
+- Conv [512, 3, 2] # P4/16
 - C2f [512]
-- CBAM [512]           # ⭐ CBAM after C2f
-- Conv [1024, 3, 2]    # P5/32
+- CBAM [512] # ⭐ CBAM after C2f
+- Conv [1024, 3, 2] # P5/32
 - C2f [1024]
 - SPPF [1024, 5]
 ```
 
 **Head Structure:**
+
 ```yaml
-- BiRepGFPN with P2, P3, P4, P5 inputs  # ⭐
+- BiRepGFPN with P2, P3, P4, P5 inputs # ⭐
 - 4 detection heads (P2, P3, P4, P5)
 ```
 
 **Configuration Details:**
+
 - Number of classes: 9 (configurable for your tomato disease dataset)
 - Scales: n, s, m, l, x variants supported
 - P2 feature output for small object detection
@@ -85,11 +91,13 @@ A complete YOLOv8 configuration with CBAM and BiRepGFPN was created:
 ## 🎯 Architecture Enhancements
 
 ### CBAM Benefits:
+
 1. **Better feature selection** - Focuses on important channels and spatial locations
 2. **Improved detection in complex backgrounds** - Filters out irrelevant information
 3. **Enhanced feature representation** - Sequential channel and spatial attention
 
 ### BiRepGFPN with P2 Benefits:
+
 1. **Better small object detection** - P2 features capture fine-grained details
 2. **Enhanced multi-scale fusion** - Bi-directional information flow
 3. **Efficient inference** - Reparameterizable convolutions merge during deployment
@@ -100,12 +108,14 @@ A complete YOLOv8 configuration with CBAM and BiRepGFPN was created:
 ## 📁 Files Modified/Created
 
 ### Created Files:
+
 1. `ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml` - Model configuration
 2. `test_cbam_birepgfpn.py` - Full model validation script
 3. `test_module_imports.py` - Module import validation script
 4. `IMPLEMENTATION_SUMMARY.md` - This documentation
 
 ### Modified Files:
+
 1. `ultralytics/nn/modules/block.py` - Added CBAM and BiRepGFPN modules
 2. `ultralytics/nn/modules/__init__.py` - Registered new modules
 3. `ultralytics/nn/tasks.py` - Added module imports
@@ -118,11 +128,11 @@ A complete YOLOv8 configuration with CBAM and BiRepGFPN was created:
 
 ```bash
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
-           data=tomato.yaml \
-           epochs=200 \
-           imgsz=640 \
-           batch=32 \
-           device=0
+  data=tomato.yaml \
+  epochs=200 \
+  imgsz=640 \
+  batch=32 \
+  device=0
 ```
 
 ### 2. **Python Training**
@@ -131,19 +141,19 @@ yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
 from ultralytics import YOLO
 
 # Load the model
-model = YOLO('ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml')
+model = YOLO("ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml")
 
 # Train the model
 results = model.train(
-    data='tomato.yaml',
+    data="tomato.yaml",
     epochs=200,
     imgsz=640,
     batch=32,
     device=0,
     patience=50,
     save=True,
-    project='tomato_detection',
-    name='yolov8-cbam-birepgfpn'
+    project="tomato_detection",
+    name="yolov8-cbam-birepgfpn",
 )
 ```
 
@@ -162,11 +172,7 @@ print(f"mAP50-95: {metrics.box.map}")
 
 ```python
 # Inference on images
-results = model.predict(
-    source='path/to/images',
-    conf=0.25,
-    save=True
-)
+results = model.predict(source="path/to/images", conf=0.25, save=True)
 
 # Process results
 for result in results:
@@ -179,6 +185,7 @@ for result in results:
 ## 🔧 Configuration Options
 
 ### Model Scales:
+
 - **n (nano)**: Fastest, smallest model
 - **s (small)**: Balanced speed and accuracy
 - **m (medium)**: Good accuracy, moderate speed
@@ -186,15 +193,18 @@ for result in results:
 - **x (xlarge)**: Highest accuracy, slower
 
 To use different scales:
+
 ```bash
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
-           scale=m  # or n, s, l, x
+  scale=m # or n, s, l, x
 ```
 
 ### Adjust Number of Classes:
+
 Edit `yolov8-cbam-birepgfpn.yaml`:
+
 ```yaml
-nc: 9  # Change to your number of classes
+nc: 9 # Change to your number of classes
 ```
 
 ---
@@ -239,28 +249,27 @@ Based on the CBAM paper (https://arxiv.org/abs/1807.06521) and RepVGG research:
 ## 🐛 Troubleshooting
 
 ### Issue: Module not found error
+
 **Solution:** Ensure you're in the ultralytics-main directory:
+
 ```bash
 cd "C:\Users\seinp\Documents\yolo training\ultralytics-main"
 ```
 
 ### Issue: CUDA out of memory
+
 **Solution:** Reduce batch size:
+
 ```bash
-yolo train model=... batch=16  # or 8
+yolo train model=... batch=16 # or 8
 ```
 
 ### Issue: Model not converging
+
 **Solution:** Try these hyperparameters:
+
 ```python
-model.train(
-    data='tomato.yaml',
-    epochs=300,
-    patience=100,
-    lr0=0.01,
-    warmup_epochs=5,
-    augment=True
-)
+model.train(data="tomato.yaml", epochs=300, patience=100, lr0=0.01, warmup_epochs=5, augment=True)
 ```
 
 ---
@@ -301,6 +310,7 @@ model.train(
 ## 📞 Support
 
 For issues or questions:
+
 1. Check the Ultralytics documentation: https://docs.ultralytics.com
 2. Review this implementation summary
 3. Run validation scripts to check module imports
@@ -311,6 +321,7 @@ For issues or questions:
 ## ✨ Summary
 
 You now have a fully functional YOLOv8 model enhanced with:
+
 - ✅ CBAM attention modules in the backbone (3 locations)
 - ✅ BiRepGFPN neck with P2 support for multi-scale fusion
 - ✅ 4-level detection head (P2, P3, P4, P5)
@@ -321,12 +332,11 @@ You now have a fully functional YOLOv8 model enhanced with:
 ```bash
 # Train your enhanced model
 yolo train model=ultralytics/cfg/models/v8/yolov8-cbam-birepgfpn.yaml \
-           data=your_tomato_dataset.yaml \
-           epochs=200 \
-           imgsz=640 \
-           batch=32 \
-           name=tomato-cbam-birepgfpn
+  data=your_tomato_dataset.yaml \
+  epochs=200 \
+  imgsz=640 \
+  batch=32 \
+  name=tomato-cbam-birepgfpn
 ```
 
 Good luck with your tomato leaf disease detection project! 🍅🔬
-
