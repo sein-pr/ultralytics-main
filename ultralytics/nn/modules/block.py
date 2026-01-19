@@ -13,50 +13,50 @@ from .conv import Conv, DWConv, GhostConv, LightConv, RepConv, autopad
 from .transformer import TransformerBlock
 
 __all__ = (
-    "DFL",
-    "HGBlock",
-    "HGStem",
-    "SPP",
-    "SPPF",
     "C1",
     "C2",
+    "C2PSA",
     "C3",
-    "C2f",
-    "C2fAttn",
-    "ImagePoolingAttn",
-    "ContrastiveHead",
-    "BNContrastiveHead",
-    "C3x",
     "C3TR",
-    "C3Ghost",
-    "GhostBottleneck",
+    "CBAM",
+    "CIB",
+    "DFL",
+    "ELAN1",
+    "PSA",
+    "SPP",
+    "SPPELAN",
+    "SPPF",
+    "AConv",
+    "ADown",
+    "Attention",
+    "BNContrastiveHead",
+    "BiRepGFPN",
     "Bottleneck",
     "BottleneckCSP",
-    "Proto",
-    "RepC3",
-    "ResNetLayer",
-    "RepNCSPELAN4",
-    "ELAN1",
-    "ADown",
-    "AConv",
-    "SPPELAN",
+    "C2f",
+    "C2fAttn",
+    "C2fCIB",
+    "C2fPSA",
+    "C3Ghost",
+    "C3k2",
+    "C3x",
     "CBFuse",
     "CBLinear",
-    "C3k2",
-    "C2fPSA",
-    "C2PSA",
-    "RepVGGDW",
-    "CIB",
-    "C2fCIB",
-    "Attention",
-    "PSA",
-    "SCDown",
-    "TorchVision",
     "ChannelAttention",
-    "SpatialAttention",
-    "CBAM",
+    "ContrastiveHead",
+    "GhostBottleneck",
+    "HGBlock",
+    "HGStem",
+    "ImagePoolingAttn",
+    "Proto",
     "RepBlock",
-    "BiRepGFPN",
+    "RepC3",
+    "RepNCSPELAN4",
+    "RepVGGDW",
+    "ResNetLayer",
+    "SCDown",
+    "SpatialAttention",
+    "TorchVision",
 )
 
 
@@ -2172,7 +2172,7 @@ class CBAM(nn.Module):
         torch.Size([1, 256, 32, 32])
     """
 
-    def __init__(self, c1: int = None, c2: int = None, reduction: int = 16, kernel_size: int = 7):
+    def __init__(self, c1: int | None = None, c2: int | None = None, reduction: int = 16, kernel_size: int = 7):
         """
         Initialize CBAM module.
 
@@ -2188,7 +2188,7 @@ class CBAM(nn.Module):
         self.ca = None
         self.sa = None
         self.initialized = False
-        
+
         # If c1 is provided, initialize immediately
         if c1 is not None:
             self._initialize(c1)
@@ -2221,7 +2221,7 @@ class CBAM(nn.Module):
             # Move to same device as input
             self.ca = self.ca.to(x.device)
             self.sa = self.sa.to(x.device)
-        
+
         out = x * self.ca(x)
         out = out * self.sa(out)
         return out
@@ -2298,8 +2298,12 @@ class BiRepGFPN(nn.Module):
 
     Examples:
         >>> fpn = BiRepGFPN(out_channel=256)
-        >>> features = [torch.randn(1, 128, 80, 80), torch.randn(1, 256, 40, 40),
-        ...             torch.randn(1, 512, 20, 20), torch.randn(1, 1024, 10, 10)]
+        >>> features = [
+        ...     torch.randn(1, 128, 80, 80),
+        ...     torch.randn(1, 256, 40, 40),
+        ...     torch.randn(1, 512, 20, 20),
+        ...     torch.randn(1, 1024, 10, 10),
+        ... ]
         >>> outputs = fpn(features)
         >>> print([out.shape for out in outputs])
     """
@@ -2314,7 +2318,7 @@ class BiRepGFPN(nn.Module):
         """
         super().__init__()
         self.out_channel = c2
-        
+
         # Will be initialized on first forward pass based on actual input channels
         self.lateral_convs = None
         self.rep_td = None
@@ -2330,22 +2334,19 @@ class BiRepGFPN(nn.Module):
             in_channels (list[int]): List of input channel counts for [P2, P3, P4, P5].
         """
         # Top-down pathway - lateral connections
-        self.lateral_convs = nn.ModuleList([
-            nn.Conv2d(in_ch, self.out_channel, 1, bias=False) for in_ch in in_channels
-        ])
+        self.lateral_convs = nn.ModuleList([nn.Conv2d(in_ch, self.out_channel, 1, bias=False) for in_ch in in_channels])
 
         # Reparameterizable blocks for top-down fusion (3 blocks for 4 levels)
         self.rep_td = nn.ModuleList([RepBlock(self.out_channel) for _ in range(3)])
 
         # Bottom-up pathway - downsampling (3 downsample ops for 4 levels)
-        self.downsample = nn.ModuleList([
-            nn.Conv2d(self.out_channel, self.out_channel, 3, stride=2, padding=1, bias=False)
-            for _ in range(3)
-        ])
+        self.downsample = nn.ModuleList(
+            [nn.Conv2d(self.out_channel, self.out_channel, 3, stride=2, padding=1, bias=False) for _ in range(3)]
+        )
 
         # Reparameterizable blocks for bottom-up fusion (3 blocks)
         self.rep_bu = nn.ModuleList([RepBlock(self.out_channel) for _ in range(3)])
-        
+
         self.initialized = True
 
     def forward(self, x: list[torch.Tensor]) -> list[torch.Tensor]:
@@ -2369,7 +2370,7 @@ class BiRepGFPN(nn.Module):
             self.rep_bu = self.rep_bu.to(x[0].device)
 
         # x = [P2, P3, P4, P5]
-        p2, p3, p4, p5 = x
+        _p2, _p3, _p4, _p5 = x
 
         # Apply lateral connections
         laterals = [conv(feat) for conv, feat in zip(self.lateral_convs, x)]
